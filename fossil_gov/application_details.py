@@ -8,7 +8,7 @@ from fossil_gov import ROOT_URL
 
 
 # TODO: How should DOE communicate with the Company?
-# TODO: Any/all Order and/or Docket numbers
+# TODO: Multiple "Any/all Order and/or Docket numbers"
 # TODO: Application Submitted By
 # TODO: Comments
 # TODO: Application Tracking Number
@@ -32,6 +32,10 @@ def had_or_have_order(text):
 
 def noop(text):
     return text
+
+
+def order_or_docket_numbers(text):
+    return text.split(':', 1)[1].strip()
 
 
 def remove_extraneous_whitespace(string):
@@ -105,6 +109,8 @@ class DetailParser(object):
             'combined_volume_for_all_selected_authorities', combined_volume),
         'Have you ever had or do you currently have an Order?': (
             'have_ever_had_or_currently_have_order', had_or_have_order),
+        'Any/all Order and/or Docket numbers:': (
+            'all_existing_order_or_docket_numbers', order_or_docket_numbers),
     }
 
     def __init__(self, rows):
