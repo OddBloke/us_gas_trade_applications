@@ -12,6 +12,8 @@ from fossil_gov import ROOT_URL
 # TODO: Application Submitted By
 # TODO: Comments
 # TODO: Application Tracking Number
+# TODO: Order Effective Date
+# TODO: Current Order Number
 
 # TODO: URLs that don't link to full applications
 
