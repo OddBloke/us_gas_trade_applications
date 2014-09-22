@@ -8,7 +8,6 @@ from fossil_gov.items import FossilGovItem
 
 # TODO: I/E/B
 # TODO: Term
-# TODO: Status
 
 
 def extract_cell(column_number):
@@ -42,6 +41,7 @@ PARSERS = {
     'init_date': extract_date_from_cell(12),
     'issue_date': extract_date_from_cell(11),
     'order_number': extract_order_number,
+    'status': extract_cell(9),
 }
 
 
