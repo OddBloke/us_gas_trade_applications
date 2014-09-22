@@ -10,6 +10,7 @@ import scrapy
 
 class FossilGovItem(scrapy.Item):
     applicant = scrapy.Field()
+    application_detail = scrapy.Field()
     docket_number = scrapy.Field()
     filed_date = scrapy.Field()
     issue_date = scrapy.Field()

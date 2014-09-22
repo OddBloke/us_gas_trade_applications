@@ -3,7 +3,19 @@ from datetime import datetime
 
 import scrapy
 
+from fossil_gov.application_details import extract_application_detail
 from fossil_gov.items import FossilGovItem
+
+
+# TODO: I/E/B
+# TODO: Term
+# TODO: Status
+# TODO: Init. Date
+# TODO: Exp. Date
+# TODO: Convert Order to dict
+
+
+Order = namedtuple('Order', ('number', 'status'))
 
 
 def extract_cell(column_number):
@@ -22,9 +34,6 @@ def extract_date_from_cell(column_number):
     return f
 
 
-Order = namedtuple('Order', ('number', 'status'))
-
-
 def extract_order_number(row):
     number = int(extract_cell(3)(row)) or None
     status = extract_cell(5)(row)
@@ -37,6 +46,7 @@ PARSERS = {
     'filed_date': extract_date_from_cell(10),
     'issue_date': extract_date_from_cell(11),
     'order_number': extract_order_number,
+    'application_detail': extract_application_detail,
 }
 
 
