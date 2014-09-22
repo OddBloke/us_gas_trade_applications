@@ -124,9 +124,8 @@ class DetailParser(object):
         return self.data
 
 
-def extract_application_detail_from_url(detail_url):
-    detail_response = requests.get(detail_url, verify=False)
-    detail_soup = BeautifulSoup(detail_response.content,
+def extract_application_detail_from_body(detail_body):
+    detail_soup = BeautifulSoup(detail_body,
                                 convertEntities=BeautifulSoup.HTML_ENTITIES)
     parser = DetailParser(detail_soup.findAll('tr'))
     return parser.parse()
@@ -135,5 +134,7 @@ def extract_application_detail_from_url(detail_url):
 def extract_application_detail(row):
     detail_url_soup = BeautifulSoup(row.xpath('.//a').extract()[0])
     detail_relative_url = detail_url_soup.find('a')['href']
-    return extract_application_detail_from_url(
+    detail_url = extract_application_detail_from_body(
         '{}{}'.format(ROOT_URL, detail_relative_url))
+    detail_response = requests.get(detail_url, verify=False)
+    return extract_application_detail_from_body(detail_response.content)
