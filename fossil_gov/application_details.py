@@ -120,14 +120,17 @@ class DetailParser(object):
         self.section_data = {}
         self.multi_line_key = None
 
+    def _complete_section(self):
+        if self.current_section:
+            key, _ = self.current_section
+            self.data[key] = self.section_data
+            self.multi_line_key = None
+        self.section_data = {}
+
     def _handle_one_column(self, row):
         text = row.find('td').text
         if text in self.sections:
-            if self.current_section:
-                key, _ = self.current_section
-                self.data[key] = self.section_data
-                self.multi_line_key = None
-            self.section_data = {}
+            self._complete_section()
             self.current_section = self.sections[text]
         else:
             for prefix in self.single_cell_translations:
@@ -158,6 +161,7 @@ class DetailParser(object):
                 self._handle_one_column(row)
             elif len(row.findAll('td')) == 2:
                 self._handle_two_columns(row)
+        self._complete_section()
         return self.data
 
 
