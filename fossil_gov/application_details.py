@@ -9,9 +9,7 @@ from fossil_gov import ROOT_URL
 
 # TODO: How should DOE communicate with the Company?
 # TODO: Multiple "Any/all Order and/or Docket numbers"
-# TODO: Application Submitted By
-# TODO: Comments
-# TODO: Application Tracking Number
+# TODO: Test comments against an application with actual comments
 # TODO: Order Effective Date
 # TODO: Current Order Number
 
@@ -34,7 +32,7 @@ def noop(text):
     return text
 
 
-def order_or_docket_numbers(text):
+def split_on_colon(text):
     return text.split(':', 1)[1].strip()
 
 
@@ -97,6 +95,14 @@ class DetailParser(object):
                                           PERSON_MAPPING),
         'Report Contact (Monthly Reports) Information:': (
             'report_contact_information', PERSON_MAPPING),
+        'Application Comments & Other Info.': ('comments_and_other_info', {
+            'Application Submitted By:': ('application_submitted_by',
+                                          split_on_colon),
+            'Comments:': ('comments', split_on_colon),
+            'Application Tracking Number:': ('application_tracking_number',
+                                             split_on_colon),
+        }),
+
     }
     simple_translations = {
         'Date Received': ('date_received', date_received),
@@ -110,7 +116,7 @@ class DetailParser(object):
         'Have you ever had or do you currently have an Order?': (
             'have_ever_had_or_currently_have_order', had_or_have_order),
         'Any/all Order and/or Docket numbers:': (
-            'all_existing_order_or_docket_numbers', order_or_docket_numbers),
+            'all_existing_order_or_docket_numbers', split_on_colon),
     }
 
     def __init__(self, rows):
@@ -132,11 +138,16 @@ class DetailParser(object):
         if text in self.sections:
             self._complete_section()
             self.current_section = self.sections[text]
-        else:
-            for prefix in self.single_cell_translations:
+            return
+        for prefix in self.single_cell_translations:
+            if text.startswith(prefix):
+                key, transform = self.single_cell_translations[prefix]
+                self.data[key] = transform(text)
+        if self.current_section:
+            for prefix in self.current_section[1]:
                 if text.startswith(prefix):
-                    key, transform = self.single_cell_translations[prefix]
-                    self.data[key] = transform(text)
+                    key, transform = self.current_section[1][prefix]
+                    self.section_data[key] = transform(text)
 
     def _handle_two_columns(self, row):
         left, right = row.findAll('td')
