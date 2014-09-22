@@ -6,9 +6,6 @@ from fossil_gov.application_details import extract_application_detail
 from fossil_gov.items import FossilGovItem
 
 
-# TODO: Term
-
-
 def extract_cell(column_number):
     def f(row):
         return row.xpath('normalize-space(td[{}])'.format(
