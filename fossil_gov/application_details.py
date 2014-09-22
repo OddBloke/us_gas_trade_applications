@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 import requests
@@ -6,7 +7,6 @@ from BeautifulSoup import BeautifulSoup
 from fossil_gov import ROOT_URL
 
 
-# TODO: Requested Authorities
 # TODO: Combined Volume for all selected authorities
 # TODO: How should DOE communicate with the Company?
 # TODO: Have you ever had or do you currently have an Order?
@@ -24,6 +24,11 @@ def noop(text):
 
 def date_received(text):
     return datetime.strptime(text, '%B %d, %Y').date()
+
+
+def requested_authorities(text):
+    raw_authorities = text.strip('- ').split('- ')
+    return [re.sub(r'\W+', ' ', authority) for authority in raw_authorities]
 
 
 PERSON_MAPPING = {
@@ -79,6 +84,8 @@ class DetailParser(object):
     simple_translations = {
         'Date Received': ('date_received', date_received),
         'Docket:': ('docket', noop),
+        'Requested Authorities:': ('requested_authorities',
+                                   requested_authorities),
     }
 
     def __init__(self, rows):
