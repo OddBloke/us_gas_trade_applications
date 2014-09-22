@@ -113,8 +113,6 @@ class DetailParser(object):
             if key == 'street':
                 self.multi_line_key = key
         elif left_text == '' and right_text != '' and self.multi_line_key:
-            print self.section_data
-            print right_text
             self.section_data[self.multi_line_key] += '\n{}'.format(right_text)
 
     def parse(self):
