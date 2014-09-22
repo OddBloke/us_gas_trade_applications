@@ -19,3 +19,4 @@ class FossilGovItem(scrapy.Item):
     issue_date = scrapy.Field()
     order_number = scrapy.Field()
     status = scrapy.Field()
+    term = scrapy.Field()

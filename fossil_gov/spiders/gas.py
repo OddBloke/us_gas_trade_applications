@@ -43,6 +43,17 @@ def extract_import_export_status(row):
     return cell
 
 
+def extract_term(row):
+    terms = {
+        'S': 'short-term',
+        'L': 'long-term',
+    }
+    cell = extract_cell(8)(row)
+    if cell in terms:
+        return terms[cell]
+    return cell
+
+
 PARSERS = {
     'applicant': extract_cell(6),
     'application_detail': extract_application_detail,
@@ -54,6 +65,7 @@ PARSERS = {
     'issue_date': extract_date_from_cell(11),
     'order_number': extract_order_number,
     'status': extract_cell(9),
+    'term': extract_term,
 }
 
 
