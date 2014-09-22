@@ -10,8 +10,7 @@ from fossil_gov import ROOT_URL
 # TODO: How should DOE communicate with the Company?
 # TODO: Multiple "Any/all Order and/or Docket numbers"
 # TODO: Test comments against an application with actual comments
-# TODO: Order Effective Date
-# TODO: Current Order Number
+# TODO: Test 'Current Order Number' in more cases.
 
 # TODO: URLs that don't link to full applications
 
@@ -30,6 +29,14 @@ def had_or_have_order(text):
 
 def noop(text):
     return text
+
+
+def order_effective_date(text):
+    parts = split_on_colon(text).split('Current Order Number:')
+    if len(parts) == 1:
+        return {'effective_date': parts[0]}
+    return {'effective_date': parts[0].strip(),
+            'current_order_number': parts[1].strip()}
 
 
 def split_on_colon(text):
@@ -117,6 +124,8 @@ class DetailParser(object):
             'have_ever_had_or_currently_have_order', had_or_have_order),
         'Any/all Order and/or Docket numbers:': (
             'all_existing_order_or_docket_numbers', split_on_colon),
+        'Order Effective Date:': ('order_effective_date',
+                                  order_effective_date),
     }
 
     def __init__(self, rows):
