@@ -38,7 +38,9 @@ def extract_import_export_status(row):
         'B': 'both',
     }
     cell = extract_cell(7)(row)
-    return statuses[cell]
+    if cell in statuses:
+        return statuses[cell]
+    return cell
 
 
 PARSERS = {
