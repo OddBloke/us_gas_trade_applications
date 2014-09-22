@@ -7,7 +7,6 @@ from BeautifulSoup import BeautifulSoup
 from fossil_gov import ROOT_URL
 
 
-# TODO: How should DOE communicate with the Company?
 # TODO: Multiple "Any/all Order and/or Docket numbers"
 # TODO: Test comments against an application with actual comments
 # TODO: Test 'Current Order Number' in more cases.
@@ -102,6 +101,9 @@ class DetailParser(object):
                                           PERSON_MAPPING),
         'Report Contact (Monthly Reports) Information:': (
             'report_contact_information', PERSON_MAPPING),
+        'How should DOE communicate with the Company?': (
+            'how_should_doe_communicate_with_the_company', {}
+        ),
         'Application Comments & Other Info.': ('comments_and_other_info', {
             'Application Submitted By:': ('application_submitted_by',
                                           split_on_colon),
@@ -140,6 +142,7 @@ class DetailParser(object):
             key, _ = self.current_section
             self.data[key] = self.section_data
             self.multi_line_key = None
+            self.current_section = None
         self.section_data = {}
 
     def _handle_one_column(self, row):
@@ -148,15 +151,21 @@ class DetailParser(object):
             self._complete_section()
             self.current_section = self.sections[text]
             return
-        for prefix in self.single_cell_translations:
-            if text.startswith(prefix):
-                key, transform = self.single_cell_translations[prefix]
-                self.data[key] = transform(text)
+        special_case_section = 'how_should_doe_communicate_with_the_company'
         if self.current_section:
+            if (self.current_section[0] == special_case_section
+                    and text.strip()):
+                self.section_data = text.strip()
+                self._complete_section()
+                return
             for prefix in self.current_section[1]:
                 if text.startswith(prefix):
                     key, transform = self.current_section[1][prefix]
                     self.section_data[key] = transform(text)
+        for prefix in self.single_cell_translations:
+            if text.startswith(prefix):
+                key, transform = self.single_cell_translations[prefix]
+                self.data[key] = transform(text)
 
     def _handle_two_columns(self, row):
         left, right = row.findAll('td')
