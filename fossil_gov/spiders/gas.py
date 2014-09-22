@@ -6,7 +6,6 @@ from fossil_gov.application_details import extract_application_detail
 from fossil_gov.items import FossilGovItem
 
 
-# TODO: I/E/B
 # TODO: Term
 
 
@@ -32,12 +31,23 @@ def extract_order_number(row):
     return {'number': number, 'status': status}
 
 
+def extract_import_export_status(row):
+    statuses = {
+        'I': 'import',
+        'E': 'export',
+        'B': 'both',
+    }
+    cell = extract_cell(7)(row)
+    return statuses[cell]
+
+
 PARSERS = {
     'applicant': extract_cell(6),
     'application_detail': extract_application_detail,
     'docket_number': extract_cell(2),
     'exp_date': extract_date_from_cell(13),
     'filed_date': extract_date_from_cell(10),
+    'import_export_status': extract_import_export_status,
     'init_date': extract_date_from_cell(12),
     'issue_date': extract_date_from_cell(11),
     'order_number': extract_order_number,

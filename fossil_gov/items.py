@@ -14,6 +14,7 @@ class FossilGovItem(scrapy.Item):
     docket_number = scrapy.Field()
     exp_date = scrapy.Field()
     filed_date = scrapy.Field()
+    import_export_status = scrapy.Field()
     init_date = scrapy.Field()
     issue_date = scrapy.Field()
     order_number = scrapy.Field()
