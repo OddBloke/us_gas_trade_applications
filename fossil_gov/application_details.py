@@ -7,7 +7,6 @@ from BeautifulSoup import BeautifulSoup
 from fossil_gov import ROOT_URL
 
 
-# TODO: Combined Volume for all selected authorities
 # TODO: How should DOE communicate with the Company?
 # TODO: Have you ever had or do you currently have an Order?
 # TODO: Any/all Order and/or Docket numbers
@@ -18,17 +17,26 @@ from fossil_gov import ROOT_URL
 # TODO: URLs that don't link to full applications
 
 
-def noop(text):
-    return text
+def combined_volume(text):
+    return remove_extraneous_whitespace(text.split(':')[1]).strip()
 
 
 def date_received(text):
     return datetime.strptime(text, '%B %d, %Y').date()
 
 
+def noop(text):
+    return text
+
+
+def remove_extraneous_whitespace(string):
+    return re.sub(r'\s+', ' ', string)
+
+
 def requested_authorities(text):
     raw_authorities = text.strip('- ').split('- ')
-    return [re.sub(r'\W+', ' ', authority) for authority in raw_authorities]
+    return [remove_extraneous_whitespace(authority)
+            for authority in raw_authorities]
 
 
 PERSON_MAPPING = {
@@ -87,6 +95,10 @@ class DetailParser(object):
         'Requested Authorities:': ('requested_authorities',
                                    requested_authorities),
     }
+    single_cell_translations = {
+        'Combined Volume for all selected authorities:': (
+            'combined_volume_for_all_selected_authorities', combined_volume),
+    }
 
     def __init__(self, rows):
         self.rows = rows
@@ -104,6 +116,11 @@ class DetailParser(object):
                 self.multi_line_key = None
             self.section_data = {}
             self.current_section = self.sections[text]
+        else:
+            for prefix in self.single_cell_translations:
+                if text.startswith(prefix):
+                    key, transform = self.single_cell_translations[prefix]
+                    self.data[key] = transform(text)
 
     def _handle_two_columns(self, row):
         left, right = row.findAll('td')
