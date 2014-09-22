@@ -8,7 +8,6 @@ from fossil_gov import ROOT_URL
 
 
 # TODO: How should DOE communicate with the Company?
-# TODO: Have you ever had or do you currently have an Order?
 # TODO: Any/all Order and/or Docket numbers
 # TODO: Application Submitted By
 # TODO: Comments
@@ -23,6 +22,10 @@ def combined_volume(text):
 
 def date_received(text):
     return datetime.strptime(text, '%B %d, %Y').date()
+
+
+def had_or_have_order(text):
+    return text.split('?')[1].strip()
 
 
 def noop(text):
@@ -98,6 +101,8 @@ class DetailParser(object):
     single_cell_translations = {
         'Combined Volume for all selected authorities:': (
             'combined_volume_for_all_selected_authorities', combined_volume),
+        'Have you ever had or do you currently have an Order?': (
+            'have_ever_had_or_currently_have_order', had_or_have_order),
     }
 
     def __init__(self, rows):
